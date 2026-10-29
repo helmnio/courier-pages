@@ -1,0 +1,47 @@
+{
+  "name": "courier-pages",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "STUDIO_DEV=1 tsx watch server/index.ts",
+    "build": "tsc --noEmit && vite build",
+    "start": "tsx server/index.ts",
+    "test": "vitest run",
+    "mcp": "tsx server/mcp.ts",
+    "test:browser": "playwright test",
+    "format": "prettier --write src server tests e2e *.ts *.json",
+    "connect": "tsx scripts/connect.ts",
+    "verify:mcp": "tsx scripts/verify-mcp.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.0",
+    "@tiptap/core": "^3.32.0",
+    "@tiptap/pm": "^3.32.0",
+    "@tiptap/react": "^3.32.0",
+    "@tiptap/starter-kit": "^3.32.0",
+    "express": "^5.1.0",
+    "fast-xml-parser": "^5.3.0",
+    "fountain-js": "^1.2.4",
+    "pdfkit": "^0.17.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/pdfkit": "^0.17.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^6.4.0",
+    "vitest": "^3.2.7"
+  }
+}

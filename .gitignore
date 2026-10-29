@@ -1,0 +1,13 @@
+node_modules/
+dist/
+data/
+*.log
+work/
+test-results/
+playwright-report/
+.DS_Store
+
+integration/logs/
+integration/bin/
+.connections-offered
+archive/
