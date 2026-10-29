@@ -9,5 +9,8 @@ playwright-report/
 
 integration/logs/
 integration/bin/
+integration/profiles/
+*.sqlite*
 .connections-offered
 archive/
+docs/screenshots/

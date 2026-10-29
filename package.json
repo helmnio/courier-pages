@@ -1,6 +1,21 @@
 {
   "name": "courier-pages",
   "version": "0.1.0",
+  "description": "A local, private writing room for human-led screenplays. AI chats suggest changes over MCP; nothing changes until you approve.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helmnio/courier-pages.git"
+  },
+  "homepage": "https://github.com/helmnio/courier-pages#readme",
+  "keywords": [
+    "screenplay",
+    "fountain",
+    "fdx",
+    "mcp",
+    "tiptap",
+    "local-first"
+  ],
   "private": true,
   "type": "module",
   "engines": {

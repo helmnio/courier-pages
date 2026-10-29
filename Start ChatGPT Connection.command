@@ -3,7 +3,10 @@ set -e
 set -o pipefail
 umask 077
 cd -- "$(dirname -- "$0")"
-export PATH="$HOME/.nvm/versions/node/v22.23.3/bin:$PATH"
+for d in "$HOME"/.nvm/versions/node/v2[2-9]*/bin /opt/homebrew/opt/node@22/bin /opt/homebrew/bin /usr/local/bin; do
+  if [[ -x "$d/node" ]]; then PATH="$d:$PATH"; break; fi
+done
+export PATH
 if ! node --import tsx --input-type=module -e 'const {backendToken,ensureBackend}=await import("./server/backend.ts");await ensureBackend(backendToken())'; then
   echo 'The local application could not be verified. No tunnel was started.'
   read -r '?Press Return to close. '
@@ -16,7 +19,7 @@ if curl -fsS --max-time 3 http://127.0.0.1:4311/healthz >/dev/null 2>&1; then
 fi
 mkdir -p integration/logs
 if [[ -z "${CONTROL_PLANE_API_KEY:-}" ]]; then
-  echo 'Screenplay Studio — private ChatGPT connection'
+  echo 'Courier Pages — private ChatGPT connection'
   echo 'Paste your OpenAI runtime API key below. It stays hidden and is not saved to disk.'
   read -rs 'CONTROL_PLANE_API_KEY?Runtime API key: '
   echo ''
@@ -41,7 +44,7 @@ if ! node --import tsx integration/check-tunnel-auth.mjs; then
   exit 1
 fi
 echo ''
-echo 'Keep this window open while ChatGPT uses Screenplay Studio.'
+echo 'Keep this window open while ChatGPT uses Courier Pages.'
 echo 'Connection status: http://127.0.0.1:4311/ui'
 echo 'Press Control+C to stop the connection.'
 integration/bin/tunnel-client run --profile screenplay-studio --profile-dir "$PWD/integration/profiles" 2>&1 | tee -a integration/logs/tunnel.log

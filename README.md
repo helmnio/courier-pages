@@ -89,11 +89,13 @@ Additional documentation: ARCHITECTURE.md, SCREENPLAY_FORMATS.md, AI_INTEGRATION
 
 ## Direct local Desktop MCP connection
 
-The existing server is configured once as `screenplay-studio` in `~/.codex/config.toml`, using absolute paths and this project's existing data folder. Reload MCP servers in the desktop app after configuration changes. MCP calls reuse the running app, or start its backend against the existing database when stopped. No additional database or replacement screenplay is created. Proposal tools still require human approval in the editor. See AI_INTEGRATION.md for the exact configuration and read-only verification command. This local route is separate from the installed tunnel plugin and does not require the tunnel or an OpenAI API key.
+The server is configured once as `courier-pages` in `~/.codex/config.toml` (run `npm run connect -- --all`), using absolute paths and your data folder. Reload MCP servers in the desktop app after configuration changes. MCP calls reuse the running app, or start its backend against the existing database when stopped. No additional database or replacement screenplay is created. Proposal tools still require human approval in the editor. See AI_INTEGRATION.md for the exact configuration and read-only verification command. This local route is separate from the installed tunnel plugin and does not require the tunnel or an OpenAI API key.
 
 ## Creating a project from a connected chat
 
-Ask the connected Screenplay Studio plugin to list projects first. If you explicitly want a new blank screenplay, use `create_project` with a title and optional author/description. It returns a new project ID and version 1 without replacing any existing project. New projects begin without scenes or planning. Read and propose edits using that ID; approvals remain in the editor.
+Ask the connected Courier Pages plugin to list projects first. If you explicitly want a new blank screenplay, use `create_project` with a title and optional author/description. It returns a new project ID and version 1 without replacing any existing project. New projects begin without scenes or planning. Read and propose edits using that ID; approvals remain in the editor.
+
+> **Optional and advanced.** The ChatGPT tunnel files (`integration/`, **Start ChatGPT Connection.command**) are the author's own setup. They need OpenAI's `tunnel-client` binary and a profile that are not included in this repository, and are not needed to use Courier Pages. Most people only need the local MCP connection above.
 
 For the installed ChatGPT plugin, keep **Start ChatGPT Connection.command** running. Its hidden key prompt does not save the runtime key. Configuration and local health alone do not establish remote authentication: the launcher now checks the runtime key's access to the tunnel, and a real plugin read must succeed. Refresh the existing plugin after new tools are added. See AI_INTEGRATION.md for logs, transport boundaries and the distinction between the local Desktop MCP entry and the remote plugin.
 
@@ -110,3 +112,7 @@ MCP adds `screenplay_get_review_notes` and `screenplay_propose_review_note`. Add
 Choose **Review mode** in the screenplay toolbar, then click the exact word or cursor position you want to discuss. Type in the yellow sticky card beside the page and choose **Pin note**. A marker identifies the character position you clicked; the word is highlighted. Click the marker or **Open discussion** for the complete thread in Review notes. **Exit review mode** returns to writing. **Hide sticky notes** gives a clean writing view.
 
 Pins store block IDs and character offsets, so repeated words can have separate references. Local editor insertions, deletions and paragraph splits map saved pins through the same edit; original quoted text remains available for context. Missing passages retain their notes. Position pins and threads survive autosave, History and full project backup/restore. Notes and pins are excluded from screenplay export and print. On narrow screens the cards stack below the page; the word markers remain in the text.
+
+## Licence
+
+[MIT](LICENSE) © 2026 George Robertson.
