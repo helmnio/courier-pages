@@ -1,4 +1,4 @@
-import { openTab } from './helpers';
+import { openTab, END_OF_SCRIPT, START_OF_LINE } from './helpers';
 import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
 test('structured typing, splitting, merging, undo, autosave and recovery', async ({ page }) => {
@@ -6,7 +6,7 @@ test('structured typing, splitting, merging, undo, autosave and recovery', async
   await expect(page.getByRole('heading', { name: 'The Last Light', exact: true })).toBeVisible();
   const editor = page.getByRole('textbox', { name: 'Screenplay editor' });
   await editor.click();
-  await editor.press('Meta+ArrowDown');
+  await editor.press(END_OF_SCRIPT);
   await editor.press('Enter');
   await editor.pressSequentially('A new beat.');
   await expect(editor).toContainText('A new beat.');
@@ -17,7 +17,7 @@ test('structured typing, splitting, merging, undo, autosave and recovery', async
   await expect(editor).not.toContainText('A second beat.');
   await editor.press('ControlOrMeta+Shift+z');
   await expect(editor).toContainText('A second beat.');
-  await editor.press('Meta+ArrowLeft');
+  await editor.press(START_OF_LINE);
   await editor.press('Backspace');
   await expect(editor.locator('p')).toHaveCount(count);
   await page.getByRole('button', { name: 'Save', exact: true }).click();
@@ -30,7 +30,7 @@ test('character cues enter dialogue and Tab changes explicit element type', asyn
   await page.goto('/');
   const editor = page.getByRole('textbox', { name: 'Screenplay editor' });
   await editor.click();
-  await editor.press('Meta+ArrowDown');
+  await editor.press(END_OF_SCRIPT);
   await editor.press('Enter');
   await editor.press('ControlOrMeta+Alt+3');
   await editor.pressSequentially('TEST WRITER');
@@ -110,11 +110,11 @@ test('unsaved text survives a competing save in a second tab', async ({ page, co
   });
   const editor = page.getByRole('textbox', { name: 'Screenplay editor' });
   await editor.click();
-  await editor.press('Meta+ArrowDown');
+  await editor.press(END_OF_SCRIPT);
   await editor.pressSequentially(' Local change kept.');
   const second = other.getByRole('textbox', { name: 'Screenplay editor' });
   await second.click();
-  await second.press('Meta+ArrowDown');
+  await second.press(END_OF_SCRIPT);
   await second.pressSequentially(' Competing edit.');
   await other.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(other.locator('.save-status')).toContainText('Saved locally');
@@ -130,7 +130,7 @@ test('recovers browser drafts after interrupted autosave', async ({ page }) => {
   );
   const editor = page.getByRole('textbox', { name: 'Screenplay editor' });
   await editor.click();
-  await editor.press('Meta+ArrowDown');
+  await editor.press(END_OF_SCRIPT);
   await editor.pressSequentially(' Recovery sentinel.');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Draft stored');
@@ -189,7 +189,7 @@ test('feature-length editor remains responsive and keeps later scenes intact', a
   const editor = page.getByRole('textbox', { name: 'Screenplay editor' });
   await expect(editor.locator('p')).toHaveCount(blocks.length);
   await editor.locator('p').last().click();
-  await editor.press('Meta+ArrowDown');
+  await editor.press(END_OF_SCRIPT);
   const start = Date.now();
   await editor.pressSequentially(' Final edit.');
   await expect(editor.locator('p').last()).toContainText('Final edit.');

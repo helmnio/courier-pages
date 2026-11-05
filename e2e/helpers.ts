@@ -23,3 +23,8 @@ export async function viewMenu(page: Page, name: string | RegExp) {
   await page.getByRole('button', { name: /^View/ }).click();
   await page.getByRole('menuitemcheckbox', { name }).click();
 }
+
+/** Keys that move the cursor differ by platform: macOS uses Cmd+Arrow, Linux and Windows use End and Home. */
+const mac = process.platform === 'darwin';
+export const END_OF_SCRIPT = mac ? 'Meta+ArrowDown' : 'Control+End';
+export const START_OF_LINE = mac ? 'Meta+ArrowLeft' : 'Home';

@@ -1,4 +1,4 @@
-import { openTab, viewMenu } from './helpers';
+import { openTab, viewMenu, START_OF_LINE } from './helpers';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 test('passage review, replies, resolution, navigation and full backup restore', async ({
@@ -140,7 +140,7 @@ test('review mode pins an exact clicked word and preserves its position through 
   expect(saved.document.notes[0].pinOffset).toBeGreaterThanOrEqual(39);
   await viewMenu(page, /Review mode/);
   await line.click();
-  await page.keyboard.press('Meta+ArrowLeft');
+  await page.keyboard.press(START_OF_LINE);
   await page.keyboard.type('Earlier: ');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Saved locally');
