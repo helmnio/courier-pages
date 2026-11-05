@@ -1,3 +1,4 @@
+import { openTab } from './helpers';
 import { test, expect } from '@playwright/test';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
@@ -90,7 +91,7 @@ test('the first MCP-created project appears in an empty editor and survives back
     expect((await invoke('screenplay_list_scenes', { projectId: created.projectId })).data).toEqual(
       [],
     );
-    await page.getByRole('button', { name: 'Planning', exact: true }).click();
+    await openTab(page, 'Planning');
     await expect(
       page.getByRole('heading', { name: 'A home for the shape of your story' }),
     ).toBeVisible();
@@ -124,12 +125,12 @@ test('the first MCP-created project appears in an empty editor and survives back
         body: 'A suggested beat',
       },
     });
-    await expect(page.getByRole('button', { name: 'Revisions · 1', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Revisions · 1', exact: true }).click();
+    await expect(page.getByRole('tab', { name: /^Revisions · 1/ })).toBeVisible();
+    await openTab(page, 'Revisions');
     await expect(
       page.getByRole('heading', { name: 'Reviewable outline suggestion', exact: true }),
     ).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Approve revision', exact: true })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Approve', exact: true })).toBeEnabled();
     expect(
       (await invoke('screenplay_get_planning', { projectId: created.projectId })).data,
     ).toEqual([]);

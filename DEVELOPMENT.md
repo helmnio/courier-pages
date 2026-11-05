@@ -1,6 +1,6 @@
 # Development status
 
-The original specification is preserved in REQUIREMENTS.md. The implemented delivery is a functional local screenplay-writing MVP spanning its foundation, editor, organisation, interchange, proposal and direct-connection phases.
+The original specification is preserved in docs/REQUIREMENTS.md. The implemented delivery is a functional local screenplay-writing MVP spanning its foundation, editor, organisation, interchange, proposal and direct-connection phases.
 
 ## Completed slices
 

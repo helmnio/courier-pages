@@ -2,11 +2,37 @@
 
 A local writing room for human-led screenplays. React, TypeScript and TipTap provide a continuous structured editor; a loopback Node server stores your work on this computer. No account, API key, subscription or cloud service is required to write. Claude, Codex and other AI chats can read your project and suggest changes over MCP; nothing changes until you approve it.
 
-## Install and open
+## Quick start
 
-1. Install [Node.js](https://nodejs.org) 22.13 or newer.
-2. Double-click **Courier Pages.command**. The first run installs what it needs, builds the app, and offers to connect the AI apps it finds (Claude Code, Claude Desktop, Codex).
-3. Your browser opens at http://127.0.0.1:4310. Keep the Terminal window open while you write.
+**You need:** a Mac and [Node.js](https://nodejs.org) 22.13 or newer (download the LTS installer and click through it).
+
+1. **Download** this project (green **Code** button → **Download ZIP**) and unzip it.
+2. **Double-click `Start Courier Pages.command`.**
+   - The first time, macOS may say it can't be opened. Right-click the file, choose **Open**, then **Open** again. You only do this once.
+   - The first run installs and builds the app (a minute or two) and asks whether to connect your AI apps. Answer **Y** to use Claude or Codex with your script.
+3. **Write.** Your browser opens at http://127.0.0.1:4310. Keep the Terminal window open while you work; press Control+C in it to stop.
+
+Next time, just double-click the same file. Your screenplays are saved on your computer in `~/Documents/Courier Pages`.
+
+### Get going with AI
+
+After connecting, restart Claude or Codex, then paste:
+
+> Use the Courier Pages tools to list my projects, then read the first scene of the one I name and suggest one improvement as a proposal I can review.
+
+The suggestion appears in the editor as a banner. Choose **Review changes** and accept or skip each change; nothing is applied until you approve it. The same line is printed in the Terminal window when the app starts.
+
+### Windows and Linux
+
+There is no double-click launcher yet. Install Node.js 22.13+, then in a terminal in this folder run `npm ci`, `npm run build` and `npm start`, and open http://127.0.0.1:4310. The AI connection step (`npm run connect`) is written for macOS paths and is untested elsewhere.
+
+### If something goes wrong
+
+- **"Needs Node.js":** install it from nodejs.org, then double-click again.
+- **Port 4310 is in use:** another copy is already running (open http://127.0.0.1:4310), or start with `PORT=4320 npm start`.
+- **AI can't see Courier Pages:** make sure the app is running, then restart Claude or Codex. `npm run verify:mcp` checks the connection.
+
+## More ways to run
 
 From a terminal instead:
 
@@ -85,7 +111,7 @@ npm run build
 
 Browser tests use an isolated database and headless Google Chrome at its standard macOS path. Set `CHROME_PATH` to a compatible Chrome/Chromium executable elsewhere. Test data is placed under ignored `work/`; it never uses your main database.
 
-Additional documentation: ARCHITECTURE.md, SCREENPLAY_FORMATS.md, AI_INTEGRATION.md, DEVELOPMENT.md and the original REQUIREMENTS.md.
+Additional documentation: ARCHITECTURE.md, SCREENPLAY_FORMATS.md, AI_INTEGRATION.md, DEVELOPMENT.md and the original [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).
 
 ## Direct local Desktop MCP connection
 

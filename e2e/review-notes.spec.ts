@@ -1,3 +1,4 @@
+import { openTab, viewMenu } from './helpers';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 test('passage review, replies, resolution, navigation and full backup restore', async ({
@@ -16,21 +17,23 @@ test('passage review, replies, resolution, navigation and full backup restore', 
   ).json();
   await page.getByLabel('Project', { exact: true }).selectOption(created.id);
   await expect(page.getByRole('heading', { name: 'Review notes test', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Screenplay', exact: true }).click();
+  await openTab(page, 'Screenplay');
   const editor = page.getByRole('textbox', { name: 'Screenplay editor' });
   const action = editor.locator('p[data-kind="action"]').first();
+  await expect(action).toContainText('A brass key catches the light.');
   await action.click();
-  await page.keyboard.press('Meta+ArrowLeft');
-  await page.keyboard.press('Meta+Shift+ArrowRight');
-  await page.getByRole('button', { name: '＋ Review note', exact: true }).click();
+  await action.selectText();
+  await page.getByRole('button', { name: 'Add review note', exact: true }).click();
   await expect(page.locator('.sticky-composer blockquote')).toBeVisible();
   await page.getByLabel('Sticky note feedback').fill('Check the brass key continuity.');
   await page.getByRole('button', { name: 'Pin note', exact: true }).click();
-  const sticky = page.locator('.script-sticky').first();
-  await expect(sticky).toContainText('Check the brass key continuity.');
-  await expect(editor.locator('.has-review-note')).toHaveCount(1);
+  const marker = page.locator('.note-marker').first();
+  await expect(marker).toHaveAttribute('aria-label', /Check the brass key continuity/);
   await expect(editor.locator('.review-passage-highlight')).toHaveCount(1);
   await page.screenshot({ path: 'work/screenplay-sticky-notes-preview.png', fullPage: true });
+  await marker.click();
+  const sticky = page.locator('.note-card');
+  await expect(sticky).toContainText('Check the brass key continuity.');
   await sticky.getByRole('button', { name: 'Open discussion', exact: true }).click();
   await page.getByLabel('Filter note status').selectOption('open');
   const card = page.locator('.review-note').first();
@@ -45,7 +48,7 @@ test('passage review, replies, resolution, navigation and full backup restore', 
   await expect(page.locator('.review-note')).toHaveCount(0);
   await page.getByLabel('Filter note status').selectOption('resolved');
   await expect(card).toContainText('Key is now visible');
-  await page.getByRole('button', { name: 'Save now', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Saved locally');
   await page.reload();
   await expect(page.getByLabel('Filter note status')).toHaveValue('resolved');
@@ -61,10 +64,10 @@ test('passage review, replies, resolution, navigation and full backup restore', 
   await page.screenshot({ path: 'work/review-notes-preview.png', fullPage: true });
   await card.locator('.note-context button').click();
   await expect(editor).toBeVisible();
-  await page.getByRole('button', { name: 'Save now', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Saved locally');
   const downloaded = page.waitForEvent('download');
-  await page.getByLabel('Download screenplay').selectOption('backup');
+  await page.getByLabel('Export screenplay').selectOption('backup');
   const download = await downloaded;
   const bytes = await readFile((await download.path())!);
   const backup = JSON.parse(bytes.toString());
@@ -102,8 +105,8 @@ test('review mode pins an exact clicked word and preserves its position through 
   ).json();
   await page.getByLabel('Project', { exact: true }).selectOption(created.id);
   await expect(page.getByRole('heading', { name: 'Exact word review', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Screenplay', exact: true }).click();
-  await page.getByRole('button', { name: 'Review mode', exact: true }).click();
+  await openTab(page, 'Screenplay');
+  await viewMenu(page, /Review mode/);
   const editor = page.getByRole('textbox', { name: 'Screenplay editor' });
   await expect(editor).toHaveAttribute('contenteditable', 'false');
   const line = editor.locator('[data-block-id="review-line"]');
@@ -126,20 +129,20 @@ test('review mode pins an exact clicked word and preserves its position through 
       (await editor.locator('.review-passage-highlight').allTextContents()).join(''),
     )
     .toBe('key');
-  const pin = editor.getByRole('button', { name: 'Open pinned review note', exact: true });
+  const pin = page.locator('.note-marker');
   await expect(pin).toHaveCount(1);
-  await page.getByRole('button', { name: 'Save now', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Saved locally');
   let saved = await (await page.request.get('/api/projects/' + created.id)).json();
   expect(saved.document.blocks).toEqual(source.document.blocks);
   expect(saved.document.notes[0].anchorFrom).toBe(39);
   expect(saved.document.notes[0].anchorTo).toBe(42);
   expect(saved.document.notes[0].pinOffset).toBeGreaterThanOrEqual(39);
-  await page.getByRole('button', { name: 'Exit review mode', exact: true }).click();
+  await viewMenu(page, /Review mode/);
   await line.click();
   await page.keyboard.press('Meta+ArrowLeft');
   await page.keyboard.type('Earlier: ');
-  await page.getByRole('button', { name: 'Save now', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Saved locally');
   saved = await (await page.request.get('/api/projects/' + created.id)).json();
   expect(saved.document.notes[0].anchorFrom).toBe(48);
@@ -152,5 +155,6 @@ test('review mode pins an exact clicked word and preserves its position through 
   await expect(pin).toHaveCount(1);
   await page.screenshot({ path: 'work/screenplay-exact-pin-preview.png', fullPage: true });
   await pin.click();
+  await page.getByRole('button', { name: 'Open discussion', exact: true }).click();
   await expect(page.locator('.review-note')).toContainText('second key specifically');
 });

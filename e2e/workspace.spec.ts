@@ -1,3 +1,4 @@
+import { openTab, viewMenu } from './helpers';
 import { test, expect } from '@playwright/test';
 async function project(page: any, title: string, long = false) {
   await page.goto('/');
@@ -33,23 +34,23 @@ async function project(page: any, title: string, long = false) {
 }
 test('plans and circle stages save, return across views and survive reload', async ({ page }) => {
   const id = await project(page, 'Planning browser check');
-  await page.getByRole('button', { name: 'Planning', exact: true }).click();
+  await openTab(page, 'Planning');
   await page.getByRole('button', { name: 'New outline', exact: true }).click();
   await page.getByLabel('Plan title', { exact: true }).fill('Mara — outline');
   await page
     .getByLabel('Plan & reference notes', { exact: true })
     .fill('Opening: the light fails. Ending: Mara chooses to leave.');
-  await page.getByRole('button', { name: 'Save now', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Saved locally');
   await page.getByRole('button', { name: 'New story circle', exact: true }).click();
   await page.getByLabel('Character or story thread').fill('Mara');
   await page.getByLabel('Story circle stage notes').fill('Alone in the lighthouse.');
   await page.getByRole('button', { name: 'Next stage', exact: true }).click();
   await page.getByLabel('Story circle stage notes').fill('She needs the truth.');
-  await page.getByRole('button', { name: 'Save now', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.save-status')).toContainText('Saved locally');
-  await page.getByRole('button', { name: 'Screenplay', exact: true }).click();
-  await page.getByRole('button', { name: 'Planning', exact: true }).click();
+  await openTab(page, 'Screenplay');
+  await openTab(page, 'Planning');
   await expect(page.getByLabel('Story circle stage notes')).toHaveValue('She needs the truth.');
   await page.reload();
   await expect(page.getByLabel('Story circle stage notes')).toHaveValue('She needs the truth.');
@@ -66,33 +67,33 @@ test('plans and circle stages save, return across views and survive reload', asy
   expect(saved.document.planning).toHaveLength(2);
   expect(saved.document.planning[1].stages.need).toBe('She needs the truth.');
 });
-test('workspace remembers panels, sidebar and focus mode without enabling site tools', async ({
+test('workspace remembers panels, sidebar and focus mode, with site tools on by default', async ({
   page,
 }) => {
   await project(page, 'Workspace browser check');
-  await page.getByRole('button', { name: 'Toggle sidebar', exact: true }).click();
-  await page.getByRole('button', { name: 'Scene notes', exact: true }).click();
-  await page.getByRole('button', { name: 'Scenes', exact: true }).click();
+  await page.getByRole('button', { name: 'Scenes and projects', exact: true }).click();
+  await viewMenu(page, 'Scene notes panel');
+  await openTab(page, 'Scenes');
   const brief = page
     .locator('details')
-    .filter({ has: page.locator('summary', { hasText: 'Scene direction brief' }) })
+    .filter({ has: page.locator(':scope > summary', { hasText: 'Scene direction brief' }) })
     .first();
-  await brief.locator('summary').click();
+  await brief.locator(':scope > summary').click();
   await expect(brief).toHaveAttribute('open', '');
   await page.reload();
   await expect(page.locator('.app')).toHaveClass(/sidebar-hidden/);
   await expect(brief).toHaveAttribute('open', '');
-  await brief.locator('summary').click();
+  await brief.locator(':scope > summary').click();
   await page.reload();
   await expect(brief).not.toHaveAttribute('open', '');
-  await page.getByRole('button', { name: 'Screenplay', exact: true }).click();
+  await openTab(page, 'Screenplay');
   await expect(page.locator('.canvas')).toHaveClass(/with-context/);
-  await page.getByRole('button', { name: 'Focus', exact: true }).click();
+  await viewMenu(page, 'Focus mode');
   await page.reload();
   await expect(page.locator('.app')).toHaveClass(/zen/);
-  await page.getByRole('button', { name: 'Focus', exact: true }).click();
-  await page.getByRole('button', { name: 'Connections', exact: true }).click();
-  await expect(page.getByLabel('Enable Site tools for this open tab')).not.toBeChecked();
+  await viewMenu(page, 'Focus mode');
+  await openTab(page, 'Connections');
+  await expect(page.getByLabel('Enable Site tools in this browser (remembered)')).toBeChecked();
 });
 test('long scripts keep an independent scroll position across tabs and reopening', async ({
   page,
@@ -110,9 +111,9 @@ test('long scripts keep an independent scroll position across tabs and reopening
     .poll(() => page.locator('.sidebar nav').evaluate((el) => el.scrollTop))
     .toBeGreaterThan(0);
   expect(await main.evaluate((el) => el.scrollTop)).toBeCloseTo(before, 0);
-  await page.getByRole('button', { name: 'Planning', exact: true }).click();
+  await openTab(page, 'Planning');
   await expect.poll(() => main.evaluate((el) => el.scrollTop)).toBe(0);
-  await page.getByRole('button', { name: 'Screenplay', exact: true }).click();
+  await openTab(page, 'Screenplay');
   await expect.poll(() => main.evaluate((el) => el.scrollTop)).toBeCloseTo(before, 0);
   await page.reload();
   await expect.poll(() => main.evaluate((el) => el.scrollTop)).toBeCloseTo(before, 0);
