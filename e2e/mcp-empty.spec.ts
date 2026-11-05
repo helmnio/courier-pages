@@ -59,7 +59,7 @@ test('the first MCP-created project appears in an empty editor and survives back
     client = new Client({ name: 'empty-editor-mcp-check', version: '1' });
     await client.connect(
       new StdioClientTransport({
-        command: '/bin/zsh',
+        command: 'bash',
         args: [path.join(root, 'integration/run-mcp.sh')],
         cwd: tmpdir(),
         env,
